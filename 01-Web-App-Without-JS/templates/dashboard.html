@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3>Your dashboard</h3>
+    <img class="avatar" src="{{ user['picture'] }}"/>
+    <h2>Welcome {{ user['nickname'] }}</h2>
+{% endblock %}
