@@ -3,13 +3,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Log in</h1>
+    <h1>Sign up</h1>
     <form method="post">
         {{ form.hidden_tag() }}
 
         {% if form.errors %}
             <div class="alert alert-danger" role="alert">
-                <strong>Not logged in.</strong> Please fix any errors below and try again.
+                <strong>Not signed up.</strong> Please fix any errors below and try again.
             </div>
         {% endif %}
 

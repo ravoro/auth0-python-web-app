@@ -11,7 +11,8 @@ from flask import session
 
 import config
 from config import AUTH0_CLIENT_ID, AUTH0_CONNECTION, AUTH0_DOMAIN, SESSION_PROFILE_KEY
-from forms import LoginForm
+from forms import LoginForm, SignupForm
+from utils import safe_auth0_call
 
 APP = Flask(__name__)
 APP.config.from_object(config)
@@ -57,10 +58,10 @@ def login():
     try:
         tokens = auth0_db.login(client_id=AUTH0_CLIENT_ID,
                                 connection=AUTH0_CONNECTION,
-                                username=form.username.data,
+                                username=form.email.data,
                                 password=form.password.data)
     except Auth0Error as err:
-        form.username.errors = [err.message]
+        form.email.errors = [err.message]
         form.password.errors = [err.message]
         return render_template('login.html', form=form), 400
 
@@ -68,6 +69,30 @@ def login():
     session[SESSION_PROFILE_KEY] = profile
 
     return redirect('/dashboard')
+
+
+@APP.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+
+    if not form.is_submitted():
+        return render_template('signup.html', form=form)
+
+    if not form.validate():
+        return render_template('signup.html', form=form), 400
+
+    try:
+        safe_auth0_call(auth0_db.signup,
+                        client_id=AUTH0_CLIENT_ID,
+                        connection=AUTH0_CONNECTION,
+                        email=form.email.data,
+                        password=form.password.data)
+    except Auth0Error as err:
+        form.email.errors = [err.message]
+        form.password.errors = [err.message]
+        return render_template('signup.html', form=form), 400
+
+    return redirect('/login')
 
 
 if __name__ == "__main__":
